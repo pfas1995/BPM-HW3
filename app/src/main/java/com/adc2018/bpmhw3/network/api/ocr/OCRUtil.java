@@ -5,6 +5,6 @@ public class OCRUtil {
     public static String getAliyunOCRBaseUrl() {
         return "http://dm-57.data.aliyun.com";
     }
-    public static String getXfyunOCRBaseUrl() { return " http://webapi.xfyun.cn"; }
+    public static String getXfyunOCRBaseUrl() { return "http://47.106.144.239:20183"; }
 
 }

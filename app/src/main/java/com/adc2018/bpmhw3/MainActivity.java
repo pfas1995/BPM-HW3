@@ -17,20 +17,26 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.adc2018.bpmhw3.adapter.BrandAdapter;
+import com.adc2018.bpmhw3.utils.BPM3;
+
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static String TAG = MainActivity.class.getSimpleName();
 
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
@@ -45,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         picture = findViewById(R.id.picture);
-        Log.d(MainActivity.class.getSimpleName(), "onCreate: " + Build.BRAND);
+        Log.d(TAG, "onCreate: " + Build.BRAND);
     }
 
     /**
@@ -53,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void takePhoto(View view) {
-        Log.d(MainActivity.class.getSimpleName(), "takePhoto: " + getExternalCacheDir());
+        Log.d(TAG, "takePhoto: " + getExternalCacheDir());
         File outputImage = new File(getExternalCacheDir(), "Output_image.jpg");
         try {
             if(outputImage.exists()) {
@@ -62,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             outputImage.createNewFile();
         }
         catch(IOException e) {
-            Log.e(MainActivity.class.getSimpleName(), "takePhoto: " + e.getMessage() );
+            Log.e(TAG, "takePhoto: " + e.getMessage() );
         }
         if( Build.VERSION.SDK_INT >= 24) {
             imageUri = FileProvider.getUriForFile(MainActivity.this,
@@ -71,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 1024*4);
         startActivityForResult(intent, TAKE_PHOTO);
     }
 
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void choosePhoto(View view) {
-        Log.d(MainActivity.class.getSimpleName(), "choosePhoto: " + "choose photo");
+        Log.d(TAG, "choosePhoto: " + "choose photo");
         if(ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions(MainActivity.this,
@@ -95,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
      * 打开相册
      */
     public void openAlbum() {
-        Log.d(MainActivity.class.getSimpleName(), "openAlbum: " + "open album");
+        Log.d(TAG, "openAlbum: " + "open album");
         Intent intent = new Intent("android.intent.action.GET_CONTENT");
         intent.setType("image/*");
         startActivityForResult(intent, CHOOSE_PHOTO);
@@ -131,15 +138,17 @@ public class MainActivity extends AppCompatActivity {
             case TAKE_PHOTO:
                 if(resultCode == RESULT_OK) {
                     try {
-                        Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
+                        InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         bitmap = BrandAdapter.rotatePhotoAfterCamera(bitmap);
+                        bitmap = BPM3.changeBitmapScale(bitmap, 1024, 768);
                         picture.setImageBitmap(bitmap);
 //                        HttpRequest request = new HttpRequest();
-//                        request.xfyunCardOCR(encodeImage(bitmap));
 //                        request.aliyunCardOCR(encodeImage(bitmap));
+//                        request.xfyunCardOCR(encodeImage(bitmap));
                     }
                     catch (FileNotFoundException e) {
-                        Log.e(MainActivity.class.getSimpleName(), "onActivityResult: " + e.getMessage() );
+                        Log.e(TAG, "onActivityResult: " + e.getMessage() );
                     }
                 }
                 break;
@@ -148,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
              */
             case CHOOSE_PHOTO:
                 if(resultCode == RESULT_OK) {
-                    Log.d(MainActivity.class.getSimpleName(), "onActivityResult: " + "call album");
+                    Log.d(TAG, "onActivityResult: " + "call album");
                     if(Build.VERSION.SDK_INT >= 19) {
                         handleImageOnkitKat(data);
                     }
@@ -166,12 +175,20 @@ public class MainActivity extends AppCompatActivity {
      */
     public String encodeImage(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
         byte[] bytes = baos.toByteArray();
-        String encode = Base64.encodeToString(bytes, Base64.DEFAULT);
-//        Log.d(MainActivity.class.getSimpleName(), "encodeImage: " + encode);
+        String encode = null;
+        try {
+            encode = new String(Base64.encodeBase64(bytes), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "encodeImage: ", e);
+        }
+        Log.d(TAG, "encodeImage: encode size: " + encode.getBytes().length + " byte");
+        Log.d(TAG, "encodeImage: " + encode);
         return encode;
     }
+
+
 
     /**
      * 对于系统版本大于4.4的设备获取相册图片
@@ -181,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleImageOnkitKat(Intent data) {
         String imagePath = null;
         Uri uri = data.getData();
-        Log.d(MainActivity.class.getSimpleName(), "handleImageOnkitKat: " + uri.getAuthority() );
+        Log.d(TAG, "handleImageOnkitKat: " + uri.getAuthority() );
         if(DocumentsContract.isDocumentUri(this, uri)) {
             //如果是document 类型的uri, 则通过document id 处理
             String docId = DocumentsContract.getDocumentId(uri);
@@ -245,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
      * @param imagePath 图片路径
      */
     private void displayImage(String imagePath) {
-        Log.d(MainActivity.class.getSimpleName(), "displayImage: imagePath: " +  imagePath);
+        Log.d(TAG, "displayImage: imagePath: " +  imagePath);
         if(imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
             picture.setImageBitmap(bitmap);

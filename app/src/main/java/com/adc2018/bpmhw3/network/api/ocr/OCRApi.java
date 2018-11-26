@@ -6,7 +6,8 @@ import com.adc2018.bpmhw3.entity.XfyunCardResult;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Header;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -26,14 +27,13 @@ public interface OCRApi {
     @POST("/rest/160601/ocr/ocr_business_card.json")
     Call<AliyunCardResult> aliyunCard(@Body CardImage cardImage);
 
-
     @Headers({
-            "Content-Type: application/x-www-form-urlencoded; charset=utf-8",
-            "X-Param: eyJlbmdpbmVfdHlwZSI6ICJidXNpbmVzc19jYXJkIn0=",
-            "X-Appid: 5bf7a5c9"
+            "Content-Type: application/x-www-form-urlencoded",
+
     })
-    @POST("/v1/service/v1/ocr/business_card")
-    Call<XfyunCardResult> xfyunCard(@Header("X-CurTime") String xCurTime,
-                                    @Header("X-CheckSum") String xCheckSum,
-                                    @Body CardImage cardImage);
+
+    @FormUrlEncoded
+    @POST("/xfyun-card-ocr")
+   Call<XfyunCardResult> xfyunCard(@Field("image") String image);
+
 }

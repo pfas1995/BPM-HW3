@@ -5,6 +5,7 @@ import android.util.Log;
 import com.adc2018.bpmhw3.entity.AliyunCardResult;
 import com.adc2018.bpmhw3.entity.CardImage;
 import com.adc2018.bpmhw3.entity.Test;
+import com.adc2018.bpmhw3.entity.XfyunCardResult;
 import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
 import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
 import com.adc2018.bpmhw3.network.api.rmp.RmpUtil;
@@ -16,6 +17,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class HttpRequest {
+    private static String TAG = HttpRequest.class.getSimpleName();
 
     /**
      * api 调用
@@ -28,12 +30,12 @@ public class HttpRequest {
         call.enqueue(new Callback<T>() {
             @Override
             public void onResponse(Call<T> call, Response<T> response) {
-                Log.d(HttpRequest.class.getSimpleName(), response.body().toString());
+                Log.d(TAG, response.body().toString());
             }
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
-                Log.e(HttpRequest.class.getSimpleName(), t.getMessage());
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -85,27 +87,14 @@ public class HttpRequest {
         callEnqueue(call);
      }
 
-//    /**
-//     * 科大讯飞云的名片请求识别
-//     * @param imageEncode 名片图片的 base64 编码
-//     */
-//    public void xfyunCardOCR(String imageEncode) {
-//        Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
-//        final OCRApi api = retrofit.create(OCRApi.class);
-//        CardImage cardImage = new CardImage();
-//        Log.d(HttpRequest.class.getSimpleName(), "xfyunCardOCR: " + imageEncode);
-//        try {
-//            imageEncode = URLEncoder.encode(imageEncode, "UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            Log.e(HttpRequest.class.getSimpleName(), "xfyunCardOCR: " + e.getMessage() );
-//        }
-//        cardImage.setImage(imageEncode);
-//        Log.d(HttpRequest.class.getSimpleName(), "xfyunCardOCR: " + imageEncode);
-//        String apiKey = "43f05d7fde83a6170efd314e9a376d76";
-//        String xParamBase64 = "eyJlbmdpbmVfdHlwZSI6ICJidXNpbmVzc19jYXJkIn0=";
-//        String xCurTime = System.currentTimeMillis() / 1000L + "";
-//        String xCheckSum = new String(Hex.encodeHex(DigestUtils.md5(apiKey + xCurTime + xParamBase64)));
-//        Call<XfyunCardResult> call = api.xfyunCard(xCurTime, xCheckSum, cardImage);
-//        callEnqueue(call);
-//     }
+    /**
+     * 科大讯飞云的名片请求识别
+     * @param imageEncode 名片图片的 base64 编码
+     */
+    public void xfyunCardOCR(String imageEncode) {
+        Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
+        final OCRApi api = retrofit.create(OCRApi.class);
+        Call<XfyunCardResult> call = api.xfyunCard(imageEncode);
+        callEnqueue(call);
+     }
 }
