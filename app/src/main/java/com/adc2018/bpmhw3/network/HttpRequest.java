@@ -19,6 +19,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+/**
+ * HttpRequest 测试使用, 请在相关 activity 中实现请求与回调，便于更新 UI
+ *
+ */
 public class HttpRequest {
     private static String TAG = HttpRequest.class.getSimpleName();
     /**
