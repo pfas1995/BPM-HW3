@@ -2,8 +2,8 @@ package com.adc2018.bpmhw3.network.api.ocr;
 
 import com.adc2018.bpmhw3.entity.AliyunCardResult;
 import com.adc2018.bpmhw3.entity.CardImage;
-import com.adc2018.bpmhw3.entity.XfyunCardResult;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -34,6 +34,6 @@ public interface OCRApi {
 
     @FormUrlEncoded
     @POST("/xfyun-card-ocr")
-   Call<XfyunCardResult> xfyunCard(@Field("image") String image);
+   Call<ResponseBody> xfyunCard(@Field("image") String image);
 
 }

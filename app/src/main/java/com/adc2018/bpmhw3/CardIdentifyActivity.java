@@ -22,8 +22,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.adc2018.bpmhw3.adapter.BrandAdapter;
-import com.adc2018.bpmhw3.utils.BPM3;
+import com.adc2018.bpmhw3.adapter.device.BrandAdapter;
+import com.adc2018.bpmhw3.entity.AliyunCardResult;
+import com.adc2018.bpmhw3.entity.CardImage;
+import com.adc2018.bpmhw3.network.RetrofitTool;
+import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
+import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -34,9 +38,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-public class MainActivity extends AppCompatActivity {
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
-    private static String TAG = MainActivity.class.getSimpleName();
+public class CardIdentifyActivity extends AppCompatActivity {
+
+    private static String TAG = CardIdentifyActivity.class.getSimpleName();
 
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
@@ -71,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "takePhoto: " + e.getMessage() );
         }
         if( Build.VERSION.SDK_INT >= 24) {
-            imageUri = FileProvider.getUriForFile(MainActivity.this,
+            imageUri = FileProvider.getUriForFile(CardIdentifyActivity.this,
                     "com.adc2018.bpmhw3.fileprovider", outputImage);
         }
 
@@ -88,9 +98,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void choosePhoto(View view) {
         Log.d(TAG, "choosePhoto: " + "choose photo");
-        if(ContextCompat.checkSelfPermission(MainActivity.this,
+        if(ContextCompat.checkSelfPermission(CardIdentifyActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(MainActivity.this,
+            ActivityCompat.requestPermissions(CardIdentifyActivity.this,
                     new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, GRANT_WRITE_EXTRNAL_STORAGE );
         }
         else {
@@ -141,11 +151,10 @@ public class MainActivity extends AppCompatActivity {
                         InputStream inputStream = getContentResolver().openInputStream(imageUri);
                         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                         bitmap = BrandAdapter.rotatePhotoAfterCamera(bitmap);
-                        bitmap = BPM3.changeBitmapScale(bitmap, 1024, 768);
+
                         picture.setImageBitmap(bitmap);
-//                        HttpRequest request = new HttpRequest();
-//                        request.aliyunCardOCR(encodeImage(bitmap));
-//                        request.xfyunCardOCR(encodeImage(bitmap));
+//                        callAliyunOCR(encodeImage(bitmap));
+//                        callXfyunOCR(encodeImage(bitmap));
                     }
                     catch (FileNotFoundException e) {
                         Log.e(TAG, "onActivityResult: " + e.getMessage() );
@@ -270,6 +279,66 @@ public class MainActivity extends AppCompatActivity {
         else {
             Toast.makeText(this, "failed to get image", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void startActivity2(View view) {
+        Intent intent = new Intent(CardIdentifyActivity.this, Main2Activity.class);
+        startActivity(intent);
+    }
+
+
+    /**
+     * 请求科大讯飞的名片识别
+     * @param imageEncode
+     */
+    private void callXfyunOCR(String imageEncode) {
+        Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
+        final OCRApi api = retrofit.create(OCRApi.class);
+        Call<ResponseBody> call = api.xfyunCard(imageEncode);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()) {
+                    //讯飞云识别成功
+                }
+                else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+            }
+        });
+    }
+
+    /**
+     * 请求阿里云的名片识别
+     * @param imageEncode 图片的base64编码
+     */
+    private void callAliyunOCR(String imageEncode) {
+        Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getAliyunOCRBaseUrl());
+        final OCRApi api = retrofit.create(OCRApi.class);
+        CardImage cardImage = new CardImage();
+        cardImage.setImage(imageEncode);
+        Call<AliyunCardResult> call = api.aliyunCard(cardImage);
+        call.enqueue(new Callback<AliyunCardResult>() {
+            @Override
+            public void onResponse(Call<AliyunCardResult> call, Response<AliyunCardResult> response) {
+                if(response.isSuccessful()) {
+                    //阿里云识别成功
+                }
+                else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AliyunCardResult> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+            }
+        });
     }
 
 

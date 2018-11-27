@@ -1,4 +1,4 @@
-package com.adc2018.bpmhw3.adapter;
+package com.adc2018.bpmhw3.adapter.device;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;

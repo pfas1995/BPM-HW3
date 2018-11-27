@@ -5,12 +5,15 @@ import android.util.Log;
 import com.adc2018.bpmhw3.entity.AliyunCardResult;
 import com.adc2018.bpmhw3.entity.CardImage;
 import com.adc2018.bpmhw3.entity.Test;
-import com.adc2018.bpmhw3.entity.XfyunCardResult;
 import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
 import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
 import com.adc2018.bpmhw3.network.api.rmp.RmpUtil;
 import com.adc2018.bpmhw3.network.api.rmp.TestApi;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -18,7 +21,6 @@ import retrofit2.Retrofit;
 
 public class HttpRequest {
     private static String TAG = HttpRequest.class.getSimpleName();
-
     /**
      * api 调用
      * onResponsec 调用成功执行
@@ -39,7 +41,15 @@ public class HttpRequest {
             }
         });
     }
-
+    private void test(Method m) {
+        try {
+            m.invoke(null);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 测试
@@ -94,7 +104,9 @@ public class HttpRequest {
     public void xfyunCardOCR(String imageEncode) {
         Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
         final OCRApi api = retrofit.create(OCRApi.class);
-        Call<XfyunCardResult> call = api.xfyunCard(imageEncode);
+        Call<ResponseBody> call = api.xfyunCard(imageEncode);
         callEnqueue(call);
      }
+
+
 }
