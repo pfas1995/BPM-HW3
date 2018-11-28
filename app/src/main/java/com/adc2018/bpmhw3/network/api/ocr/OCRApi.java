@@ -1,7 +1,7 @@
 package com.adc2018.bpmhw3.network.api.ocr;
 
-import com.adc2018.bpmhw3.entity.AliyunCardResult;
-import com.adc2018.bpmhw3.entity.CardImage;
+import com.adc2018.bpmhw3.entity.ocr.AliyunCardResult;
+import com.adc2018.bpmhw3.entity.ocr.CardImage;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

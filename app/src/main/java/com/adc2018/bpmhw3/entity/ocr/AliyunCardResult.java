@@ -1,4 +1,4 @@
-package com.adc2018.bpmhw3.entity;
+package com.adc2018.bpmhw3.entity.ocr;
 
 import java.util.List;
 

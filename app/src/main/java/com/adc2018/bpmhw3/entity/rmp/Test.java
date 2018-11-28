@@ -1,4 +1,4 @@
-package com.adc2018.bpmhw3.entity;
+package com.adc2018.bpmhw3.entity.rmp;
 
 public class Test {
     String id;

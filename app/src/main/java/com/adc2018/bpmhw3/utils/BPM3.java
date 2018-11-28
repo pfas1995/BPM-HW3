@@ -3,6 +3,8 @@ package com.adc2018.bpmhw3.utils;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 
+import com.adc2018.bpmhw3.entity.rmp.User;
+
 public class BPM3 {
     public static Bitmap changeBitmapScale(Bitmap bitmap, int nwidth, int nheight) {
         int width = bitmap.getWidth();
@@ -14,4 +16,7 @@ public class BPM3 {
         Bitmap bm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
         return bm;
     }
+
+    //登录用户
+    public static User user;
 }

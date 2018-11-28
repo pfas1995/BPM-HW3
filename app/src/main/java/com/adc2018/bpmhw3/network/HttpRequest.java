@@ -2,9 +2,9 @@ package com.adc2018.bpmhw3.network;
 
 import android.util.Log;
 
-import com.adc2018.bpmhw3.entity.AliyunCardResult;
-import com.adc2018.bpmhw3.entity.CardImage;
-import com.adc2018.bpmhw3.entity.Test;
+import com.adc2018.bpmhw3.entity.ocr.AliyunCardResult;
+import com.adc2018.bpmhw3.entity.ocr.CardImage;
+import com.adc2018.bpmhw3.entity.rmp.Test;
 import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
 import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
 import com.adc2018.bpmhw3.network.api.rmp.RmpUtil;
@@ -111,6 +111,14 @@ public class HttpRequest {
         Call<ResponseBody> call = api.xfyunCard(imageEncode);
         callEnqueue(call);
      }
+
+
+//     private static BPMApi bpmApi = null;
+//     public static BPMApi getBPMApi() {
+//        if(bpmApi == null)
+//            bpmApi =  RetrofitTool.getRetrofit(RmpUtil.getBaseUrl()).create(BPMApi.class);
+//        return bpmApi;
+//     }
 
 
 }

@@ -1,4 +1,4 @@
-package com.adc2018.bpmhw3;
+package com.adc2018.bpmhw3.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -22,9 +22,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.adc2018.bpmhw3.R;
 import com.adc2018.bpmhw3.adapter.device.BrandAdapter;
-import com.adc2018.bpmhw3.entity.AliyunCardResult;
-import com.adc2018.bpmhw3.entity.CardImage;
+import com.adc2018.bpmhw3.entity.ocr.AliyunCardResult;
+import com.adc2018.bpmhw3.entity.ocr.CardImage;
 import com.adc2018.bpmhw3.network.RetrofitTool;
 import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
 import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
@@ -59,7 +60,7 @@ public class CardIdentifyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_cardidentify);
         picture = findViewById(R.id.picture);
         Log.d(TAG, "onCreate: " + Build.BRAND);
     }
@@ -282,7 +283,7 @@ public class CardIdentifyActivity extends AppCompatActivity {
     }
 
     public void startActivity2(View view) {
-        Intent intent = new Intent(CardIdentifyActivity.this, Main2Activity.class);
+        Intent intent = new Intent(CardIdentifyActivity.this, LoginActivity.class);
         startActivity(intent);
     }
 

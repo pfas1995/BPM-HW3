@@ -1,6 +1,6 @@
 package com.adc2018.bpmhw3.network.api.rmp;
 
-import com.adc2018.bpmhw3.entity.Test;
+import com.adc2018.bpmhw3.entity.rmp.Test;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
