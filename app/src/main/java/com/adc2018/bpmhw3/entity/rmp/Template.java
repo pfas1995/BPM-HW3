@@ -3,6 +3,9 @@ package com.adc2018.bpmhw3.entity.rmp;
 import java.io.Serializable;
 
 public class Template implements Serializable {
+
+    private static final String type = "Template";
+
     private String id;
     private String tname;
     private String turi;
@@ -29,6 +32,10 @@ public class Template implements Serializable {
 
     public void setTuri(String turi) {
         this.turi = turi;
+    }
+
+    public static String getType() {
+        return type;
     }
 
     @Override

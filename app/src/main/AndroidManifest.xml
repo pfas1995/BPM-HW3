@@ -38,7 +38,9 @@
         <activity android:name=".activity.RegisterActivity" />
         <activity
             android:name=".activity.HomeActivity"
-            android:label="@string/title_activity_home"></activity>
+            android:label="@string/title_activity_home" />
+        <activity android:name=".activity.AdjustActivity" />
+        <activity android:name=".activity.DesignCardActivity"></activity>
     </application>
 
 </manifest>

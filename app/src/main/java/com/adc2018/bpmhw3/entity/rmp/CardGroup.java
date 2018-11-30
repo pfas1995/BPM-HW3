@@ -5,6 +5,8 @@ import java.util.List;
 
 public class CardGroup implements Serializable {
 
+    private static final String type = "CardGroup";
+
     private String id;
     private String group_name;
     private List<Card> cards;
@@ -40,5 +42,9 @@ public class CardGroup implements Serializable {
 
     public void setCards(List<Card> cards) {
         this.cards = cards;
+    }
+
+    public static String getType() {
+        return type;
     }
 }

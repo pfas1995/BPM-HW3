@@ -4,10 +4,13 @@ import java.io.Serializable;
 
 public class User implements Serializable {
 
+    private static final String type = "User";
+
     private String id;
     private String user_name;
     private String user_pwd;
     private String role;
+
 
     public static User getInstance(String name, String pwd) {
         User user = new User();
@@ -50,6 +53,9 @@ public class User implements Serializable {
         this.user_pwd = user_pwd;
     }
 
+    public static String getType() {
+        return type;
+    }
 
     @Override
     public String toString() {

@@ -23,12 +23,21 @@ public class HomeActivity extends Activity {
     }
 
     /**
-     *
+     * 名片识别按钮
      * @param view
      */
     public void identifyCardClick(View view) {
         Intent intent = new Intent(HomeActivity.this, CardIdentifyActivity.class);
         startActivityForResult(intent, IDENTFY_CARD);
+    }
+
+    /**
+     * 设计名片按钮
+     * @param view
+     */
+    public void designCardClick(View view) {
+        Intent intent = new Intent(HomeActivity.this, DesignCardActivity.class);
+        startActivity(intent);
     }
 
 }

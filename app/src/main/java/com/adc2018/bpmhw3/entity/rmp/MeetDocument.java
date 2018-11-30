@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class MeetDocument implements Serializable {
 
+    private static final String type = "MeetDocument";
+
     private String id;
     private Long meet_time;
     private Double meet_longitide;
@@ -48,6 +50,10 @@ public class MeetDocument implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public static String getType() {
+        return type;
     }
 
     @Override

@@ -21,7 +21,8 @@
         android:id="@+id/designCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="设计自己的名片"/>
+        android:onClick="designCardClick"
+        android:text="设计自己的名片" />
 
     <Button
         android:layout_width="match_parent"

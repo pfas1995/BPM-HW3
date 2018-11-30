@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class Meet implements Serializable {
 
+    private static final String type = "Meet";
+
     private String id;
     private User persona;
     private Card personb;
@@ -39,6 +41,10 @@ public class Meet implements Serializable {
 
     public void setMeetDocument(MeetDocument meetDocument) {
         this.meetDocument = meetDocument;
+    }
+
+    public static String getType() {
+        return type;
     }
 
     @Override

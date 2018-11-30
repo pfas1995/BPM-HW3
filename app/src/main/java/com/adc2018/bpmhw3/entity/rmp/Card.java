@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class Card implements Serializable {
 
+    private static final String type = "Card";
+
     private String id;
     private String name;
     private String company;
@@ -11,6 +13,19 @@ public class Card implements Serializable {
     private String phone_number;
     private String address;
     private String email;
+
+
+    public static Card CardFactory(String name, String company, String position, String phone_number,
+                                   String address, String email) {
+        Card card = new Card();
+        card.name = name;
+        card.company = company;
+        card.position = position;
+        card.phone_number = phone_number;
+        card.address = address;
+        card.email = email;
+        return  card;
+    }
 
     public String getId() {
         return id;
@@ -66,6 +81,10 @@ public class Card implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public static String getType() {
+        return type;
     }
 
     @Override

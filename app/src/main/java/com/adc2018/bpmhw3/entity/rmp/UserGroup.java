@@ -5,6 +5,8 @@ import java.util.List;
 
 public class UserGroup implements Serializable {
 
+    private static final String type = "UserGroup";
+
     private String id;
     private User user;
     private List<CardGroup> group;
@@ -27,6 +29,10 @@ public class UserGroup implements Serializable {
 
     public List<CardGroup> getGroup() {
         return group;
+    }
+
+    public static String getType() {
+        return type;
     }
 
     @Override
