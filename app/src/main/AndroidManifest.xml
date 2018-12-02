@@ -34,13 +34,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.CardIdentifyActivity" />
-        <activity android:name=".activity.RegisterActivity" />
+        <activity android:name=".activity.CardIdentifyActivity"></activity>
+        <activity android:name=".activity.RegisterActivity"></activity>
         <activity
             android:name=".activity.HomeActivity"
-            android:label="@string/title_activity_home" />
-        <activity android:name=".activity.AdjustActivity" />
+            android:label="@string/title_activity_home"></activity>
+        <activity android:name=".activity.AdjustActivity"></activity>
         <activity android:name=".activity.DesignCardActivity"></activity>
+        <activity android:name=".activity.GroupManageActivity"></activity>
+        <activity android:name=".activity.ExchangeCardActivity"></activity>
     </application>
 
 </manifest>

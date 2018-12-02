@@ -97,7 +97,6 @@ public class DesignCardActivity extends AppCompatActivity {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-
     }
 
 
@@ -112,6 +111,14 @@ public class DesignCardActivity extends AppCompatActivity {
         else {
             updateUserCard();
         }
+    }
+
+    /**
+     * 返回按钮
+     * @param view
+     */
+    public void retClick(View view) {
+        finish();
     }
 
     /**
@@ -176,6 +183,33 @@ public class DesignCardActivity extends AppCompatActivity {
      * 修改个人信息
      */
     public void updateUserCard() {
+        Card editCard = Card.CardFactory(editName.getText().toString(), editCompany.getText().toString(),
+                editPosition.getText().toString(), editPhone.getText().toString(),
+                editAddress.getText().toString(), editEmail.getText().toString());
+        editCard.setId(card.getId());
+        Call<Card> call = api.updateCard(editCard.getId(), editCard);
+        call.enqueue(new Callback<Card>() {
+            @Override
+            public void onResponse(Call<Card> call, Response<Card> response) {
+                if(response.isSuccessful()) {
+                    Toast.makeText(DesignCardActivity.this, "信息修改成功", Toast.LENGTH_SHORT).show();
+                    card = response.body();
+                    userCard.setCard(card);
+                }
+                else {
+                    Toast.makeText(DesignCardActivity.this, "信息修改失败", Toast.LENGTH_SHORT).show();
+                    try {
+                        Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
+                    } catch (IOException e) {
+                        Log.e(TAG, "onResponse: ", e);
+                    }
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Card> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+            }
+        });
     }
 }

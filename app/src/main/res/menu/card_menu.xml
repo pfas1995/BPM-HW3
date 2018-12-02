@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/move"
+        android:icon="@mipmap/ic_launcher"
+        android:title="移动到其他分组"/>
+
+    <item
+        android:id="@+id/remove"
+        android:icon="@mipmap/ic_launcher"
+        android:title="移除"/>
+
+    <item
+        android:id="@+id/call"
+        android:icon="@mipmap/ic_launcher"
+        android:title="发起联系"/>
+
+    <item
+        android:id="@+id/message"
+        android:icon="@mipmap/ic_launcher"
+        android:title="发消息"/>
+</menu>
+
+

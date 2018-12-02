@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.GroupManageActivity">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="+添加新的分组"
+            android:onClick="addGroupClick"
+            />
+    </LinearLayout>
+    <ExpandableListView
+        android:id="@+id/groupList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </ExpandableListView>
+
+</LinearLayout>

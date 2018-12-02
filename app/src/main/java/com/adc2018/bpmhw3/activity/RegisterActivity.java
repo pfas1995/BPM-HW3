@@ -1,11 +1,8 @@
 package com.adc2018.bpmhw3.activity;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +10,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.adc2018.bpmhw3.R;
+import com.adc2018.bpmhw3.entity.rmp.CardGroup;
 import com.adc2018.bpmhw3.entity.rmp.User;
+import com.adc2018.bpmhw3.entity.rmp.UserGroup;
 import com.adc2018.bpmhw3.network.RetrofitTool;
 import com.adc2018.bpmhw3.network.api.rmp.BPMApi;
 import com.adc2018.bpmhw3.network.api.rmp.RmpUtil;
@@ -38,8 +37,9 @@ public class RegisterActivity extends AppCompatActivity {
     private Context ctx;
     private final BPMApi bpmApi = RetrofitTool.getRetrofit(RmpUtil.getBaseUrl()).create(BPMApi.class);
     private User user;
-    private List<BroadcastReceiver> broadcastReceiverList = new ArrayList<>();
-    private LocalBroadcastManager localBroadcastManager;
+
+    private UserGroup userGroup;
+    private CardGroup defaultCardGroup;
 
 
     @Override
@@ -50,37 +50,9 @@ public class RegisterActivity extends AppCompatActivity {
         registernameEdit = findViewById(R.id.registerName);
         passwdEdit = findViewById(R.id.registerPasswd);
         passwdconfirmEdit = findViewById(R.id.registerPasswdConfirm);
-        registerLocalBroadcastReceiver(new ValidBroadcastReceiver(), "com.adc2018.bpmhw3.register.VALID");
-    }
-
-    /***
-     * 注册一个本地广播接收器
-     * @param br 接收器
-     * @param action 响应广播
-     */
-    private void registerLocalBroadcastReceiver(BroadcastReceiver br, String action) {
-        if(localBroadcastManager == null) {
-            localBroadcastManager = LocalBroadcastManager.getInstance(this);
-        }
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(action);
-        localBroadcastManager.registerReceiver(br, intentFilter);
-        broadcastReceiverList.add(br);
     }
 
 
-    /**
-     * 注销所有的本地广播接器
-     * 只在 onDestroy() 中调用
-     */
-    private void unregisterAllLocalReceiver() {
-        if(localBroadcastManager != null) {
-            for(BroadcastReceiver br : broadcastReceiverList) {
-                localBroadcastManager.unregisterReceiver(br);
-            }
-            broadcastReceiverList.clear();
-        }
-    }
 
     /**
      * 注册按钮监听事件
@@ -99,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
         user = User.getInstance(name, passwd);
-        register(user);
+        checkValid();
     }
 
     /**
@@ -113,23 +85,22 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     /**
-     * 注册用户
-     * @param user 用户
+     * 检测用户是否合法
+     *
      */
-    public void register(User user) {
+    public void checkValid() {
         Call<UserList> call = bpmApi.getUserByName(user.getUser_name());
         call.enqueue(new Callback<UserList>() {
             @Override
             public void onResponse(Call<UserList> call, Response<UserList> response) {
                 if(response.isSuccessful()){
                     //首先检查用户是否存在
-                    Boolean valid = false;
                     if(response.body().empty()) {
-                        valid = true;
+                        register();
                     }
-                    Intent intent = new Intent("com.adc2018.bpmhw3.register.VALID");
-                    intent.putExtra("valid", valid);
-                    localBroadcastManager.sendBroadcast(intent);
+                    else {
+                        Toast.makeText(ctx, "非法用户名", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else{
                     try {
@@ -150,48 +121,100 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        this.unregisterAllLocalReceiver();
-    }
-
-    private class ValidBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, final Intent intent) {
-            Boolean valid = intent.getBooleanExtra("valid",false);
-            if(!valid) {
-                Toast.makeText(ctx, "非法用户", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Call<User> call = bpmApi.registerUser(user);
-                call.enqueue(new Callback<User>() {
-                    @Override
-                    public void onResponse(Call<User> call, Response<User> response) {
-                        if(response.isSuccessful()) {
-                            Toast.makeText(ctx, "注册成功", Toast.LENGTH_SHORT).show();
-                            Intent intent1 = new Intent();
-                            RegisterActivity.this.setResult(RESULT_CANCELED, intent1);
-                            finish();
-                        }
-                        else {
-                            Toast.makeText(ctx, "注册失败", Toast.LENGTH_SHORT).show();
-                            try {
-                                Log.i(TAG, "onResponse: "+ new String(response.errorBody().bytes()));
-                            } catch (IOException e) {
-                                Toast.makeText(ctx, "一些意料之外的事情发生了", Toast.LENGTH_SHORT).show();
-                                Log.e(TAG, "onResponse: ", e);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<User> call, Throwable t) {
+    /**
+     * 注册用户
+     */
+    private void register() {
+        Call<User> call = bpmApi.registerUser(user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(response.isSuccessful()) {
+                    user = response.body();
+                    addDefaultCardGroup();
+                }
+                else {
+                    Toast.makeText(ctx, "注册失败", Toast.LENGTH_SHORT).show();
+                    try {
+                        Log.i(TAG, "onResponse: "+ new String(response.errorBody().bytes()));
+                    } catch (IOException e) {
                         Toast.makeText(ctx, "一些意料之外的事情发生了", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "onResponse: ", t);
+                        Log.e(TAG, "onResponse: ", e);
                     }
-                });
+                }
             }
-        }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(ctx, "一些意料之外的事情发生了", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onResponse: ", t);
+            }
+        });
     }
+
+    /**
+     * 创建用户默认分组
+     */
+    public void addDefaultCardGroup() {
+        defaultCardGroup = CardGroup.Factory(user.getUser_name() + "默认分组");
+        Call<CardGroup> call = bpmApi.addCardGroup(defaultCardGroup);
+        call.enqueue(new Callback<CardGroup>() {
+            @Override
+            public void onResponse(Call<CardGroup> call, Response<CardGroup> response) {
+                if(response.isSuccessful()) {
+                    defaultCardGroup = response.body();
+                    List<CardGroup> cardGroups = new ArrayList<>();
+                    cardGroups.add(defaultCardGroup);
+                    addUserGroup(cardGroups);
+                }
+                else {
+                    try {
+                        Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
+                    } catch (IOException e) {
+                        Log.e(TAG, "onResponse: ", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CardGroup> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+            }
+        });
+    }
+
+    /**
+     * 创建用户分组
+     * @param cardGroups
+     */
+    public void addUserGroup(final List<CardGroup> cardGroups) {
+        userGroup = UserGroup.Factory(user, cardGroups);
+        Call<UserGroup> call = bpmApi.addUserGroup(userGroup);
+        call.enqueue(new Callback<UserGroup>() {
+            @Override
+            public void onResponse(Call<UserGroup> call, Response<UserGroup> response) {
+                if(response.isSuccessful()) {
+                    userGroup = response.body();
+                    Log.d(TAG, "onResponse: " + userGroup.toString());
+                    Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                else {
+                    try {
+                        Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
+                    } catch (IOException e) {
+                        Log.e(TAG, "onResponse: ", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserGroup> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+            }
+        });
+    }
+
+
+
 }

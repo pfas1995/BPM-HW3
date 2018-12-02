@@ -152,10 +152,12 @@
             android:textSize="20dp" />
 
         <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
+            android:id="@+id/returnButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="取消"
+            android:onClick="retClick"
+            android:text="返回"
             android:textSize="20dp"
             android:layout_weight="1"/>
     </LinearLayout>

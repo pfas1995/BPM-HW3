@@ -34,7 +34,8 @@
         android:id="@+id/identifyCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="交换名片"/>
+        android:onClick="exchangeCardClick"
+        android:text="交换名片" />
 
     <Button
         android:id="@+id/shareCard"

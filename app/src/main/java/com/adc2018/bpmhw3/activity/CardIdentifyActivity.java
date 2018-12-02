@@ -26,11 +26,15 @@ import com.adc2018.bpmhw3.R;
 import com.adc2018.bpmhw3.adapter.device.BrandAdapter;
 import com.adc2018.bpmhw3.entity.ocr.AliyunCardResult;
 import com.adc2018.bpmhw3.entity.ocr.CardImage;
+import com.adc2018.bpmhw3.entity.rmp.Card;
 import com.adc2018.bpmhw3.network.RetrofitTool;
 import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
 import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
 
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -38,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -49,9 +54,10 @@ public class CardIdentifyActivity extends AppCompatActivity {
 
     private static String TAG = CardIdentifyActivity.class.getSimpleName();
 
+    private static final int ADJUST_ACTIVITY = 0;
     public static final int TAKE_PHOTO = 1;
     public static final int CHOOSE_PHOTO = 2;
-    public static final int GRANT_WRITE_EXTRNAL_STORAGE = 1;
+    public static final int GRANT_WRITE_EXTRNAL_STORAGE = 3;
 
     private ImageView picture;
     private Uri imageUri;
@@ -146,6 +152,12 @@ public class CardIdentifyActivity extends AppCompatActivity {
             /**
              * 处理拍完照的
              * */
+            case ADJUST_ACTIVITY:
+                Log.d(TAG, "onActivityResult: " + String.valueOf(resultCode));
+                if (resultCode == RESULT_OK) {
+                    finish();
+                }
+                break;
             case TAKE_PHOTO:
                 if(resultCode == RESULT_OK) {
                     try {
@@ -155,7 +167,8 @@ public class CardIdentifyActivity extends AppCompatActivity {
 
                         picture.setImageBitmap(bitmap);
 //                        callAliyunOCR(encodeImage(bitmap));
-//                        callXfyunOCR(encodeImage(bitmap));
+                        setContentView(R.layout.progressbar_layout);
+                        callXfyunOCR(encodeImage(bitmap));
                     }
                     catch (FileNotFoundException e) {
                         Log.e(TAG, "onActivityResult: " + e.getMessage() );
@@ -175,6 +188,7 @@ public class CardIdentifyActivity extends AppCompatActivity {
                         handleImageBeforeKitKat(data);
                     }
                 }
+                break;
         }
     }
 
@@ -194,7 +208,6 @@ public class CardIdentifyActivity extends AppCompatActivity {
             Log.e(TAG, "encodeImage: ", e);
         }
         Log.d(TAG, "encodeImage: encode size: " + encode.getBytes().length + " byte");
-        Log.d(TAG, "encodeImage: " + encode);
         return encode;
     }
 
@@ -293,17 +306,32 @@ public class CardIdentifyActivity extends AppCompatActivity {
      * @param imageEncode
      */
     private void callXfyunOCR(String imageEncode) {
-        Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
+        final Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
         final OCRApi api = retrofit.create(OCRApi.class);
         Call<ResponseBody> call = api.xfyunCard(imageEncode);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                setContentView(R.layout.activity_cardidentify);
                 if(response.isSuccessful()) {
                     //讯飞云识别成功
+                    Card card = parseXfyunResponse(response.body());
+                    if(card == null) {
+                        Toast.makeText(CardIdentifyActivity.this, "识别失败", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Intent intent = new Intent(CardIdentifyActivity.this, AdjustActivity.class);
+                        intent.putExtra("card", card);
+                        startActivityForResult(intent, ADJUST_ACTIVITY);
+                    }
                 }
                 else {
-
+                    Toast.makeText(CardIdentifyActivity.this, "识别失败", Toast.LENGTH_SHORT).show();
+                    try {
+                        Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -329,6 +357,7 @@ public class CardIdentifyActivity extends AppCompatActivity {
             public void onResponse(Call<AliyunCardResult> call, Response<AliyunCardResult> response) {
                 if(response.isSuccessful()) {
                     //阿里云识别成功
+                    Log.d(TAG, "onResponse: " + response.body().toString());
                 }
                 else {
 
@@ -340,6 +369,72 @@ public class CardIdentifyActivity extends AppCompatActivity {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
+    }
+
+    public Card parseXfyunResponse(ResponseBody responseBody) {
+        Card card = null;
+        try {
+            String response = responseBody.string();
+            Log.d(TAG, "parseXfyunResponse: " + response);
+            JSONObject jsonObject = new JSONObject(response);
+            String code = jsonObject.getString("code");
+            Log.d(TAG, "parseXfyunResponse: " + code);
+            if(Objects.equals(code, "0")){
+                card = XfyunJsonToCard(jsonObject.getJSONObject("data"));
+            }
+            else {
+                Toast.makeText(this, "识别失败", Toast.LENGTH_SHORT).show();
+                return card;
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, "parseXfyunResponse: ", e);
+        } catch (JSONException e) {
+            Log.e(TAG, "parseXfyunResponse: ", e);
+        }
+        return card;
+    }
+
+
+    public Card XfyunJsonToCard(JSONObject jsonObject) {
+        Card card = new Card();
+        try {
+            JSONArray jsonArray = null;
+            if(jsonObject.has("formatted_name")) {
+                jsonArray = jsonObject.getJSONArray("formatted_name");
+                String name = jsonArray.getJSONObject(0).getString("item");
+                card.setName(name);
+            }
+            if(jsonObject.has("organization")) {
+                jsonArray = jsonObject.getJSONArray("organization");
+                String company = jsonArray.getJSONObject(0).getJSONObject("item").getString("name");
+                card.setCompany(company);
+            }
+            if(jsonObject.has("title")) {
+                jsonArray = jsonObject.getJSONArray("title");
+                String position = jsonArray.getJSONObject(0).getString("item");
+                card.setPosition(position);
+            }
+            if(jsonObject.has("telephone")) {
+                jsonArray = jsonObject.getJSONArray("telephone");
+                String phone = jsonArray.getJSONObject(0).getJSONObject("item").getString("number");
+                card.setPhone_number(phone);
+            }
+            if(jsonObject.has("label")) {
+                jsonArray = jsonObject.getJSONArray("label");
+                String address = jsonArray.getJSONObject(0).getJSONObject("item").getString("address");
+                card.setAddress(address);
+            }
+            if(jsonObject.has("email")) {
+                jsonArray = jsonObject.getJSONArray("email");
+                String email = jsonArray.getJSONObject(0).getString("item");
+                card.setEmail(email);
+            }
+            Log.d(TAG, "XfyunJsonToCard: " + card.toString());
+        } catch (JSONException e) {
+            Log.e(TAG, "XfyunJsonToCard: ", e);
+        }
+        return card;
     }
 
 

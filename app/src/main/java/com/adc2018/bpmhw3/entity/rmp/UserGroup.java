@@ -11,6 +11,13 @@ public class UserGroup implements Serializable {
     private User user;
     private List<CardGroup> group;
 
+    public static UserGroup Factory(User user, List<CardGroup> group) {
+        UserGroup userGroup = new UserGroup();
+        userGroup.user = user;
+        userGroup.group = group;
+        return userGroup;
+    }
+
     public String getId() {
         return id;
     }
@@ -31,9 +38,14 @@ public class UserGroup implements Serializable {
         return group;
     }
 
+    public void addCardGroup(CardGroup cardGroup) {
+        this.group.add(cardGroup);
+    }
+
     public static String getType() {
         return type;
     }
+
 
     @Override
     public String toString() {

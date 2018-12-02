@@ -1,6 +1,7 @@
 package com.adc2018.bpmhw3.entity.rmp;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CardGroup implements Serializable {
@@ -10,6 +11,21 @@ public class CardGroup implements Serializable {
     private String id;
     private String group_name;
     private List<Card> cards;
+
+    public static CardGroup Factory(String group_name) {
+        CardGroup cardGroup = new CardGroup();
+        cardGroup.setGroup_name(group_name);
+        cardGroup.setCards(new ArrayList<Card>());
+        return cardGroup;
+    }
+
+    public static CardGroup Factory(String id, String group_name, List<Card> cards) {
+        CardGroup cardGroup = new CardGroup();
+        cardGroup.setId(id);
+        cardGroup.setGroup_name(group_name);
+        cardGroup.setCards(cards);
+        return cardGroup;
+    }
 
     public String getId() {
         return id;
@@ -46,5 +62,18 @@ public class CardGroup implements Serializable {
 
     public static String getType() {
         return type;
+    }
+
+    public void addCard(Card card) {
+        if(cards == null) {
+            cards = new ArrayList<>();
+        }
+        cards.add(card);
+    }
+
+    public void removeCard(Card card) {
+        if(cards != null) {
+            cards.remove(card);
+        }
     }
 }
