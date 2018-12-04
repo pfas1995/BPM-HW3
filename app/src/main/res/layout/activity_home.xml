@@ -6,42 +6,110 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.HomeActivity">
-
     <TextView
         android:id="@+id/userName"
+        android:textSize="30dp"
+        android:layout_gravity="right"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="用户名"
          />
 
-    <Button
+    <LinearLayout
         android:id="@+id/designCard"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="designCardClick"
-        android:text="设计自己的名片" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:onClick="designCardClick">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="identifyCardClick"
-        android:text="识别名片"/>
+        <ImageView
+            android:background="@mipmap/card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <Button
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:textSize="20dp"
+            android:text="个人名片"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/identifyCard"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="exchangeCardClick"
-        android:text="交换名片" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:onClick="identifyCardClick">
 
-    <Button
-        android:id="@+id/shareCard"
+        <ImageView
+            android:background="@mipmap/identify_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:textSize="20dp"
+            android:text="名片识别"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/exchangeCard"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="分享名片"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:onClick="exchangeCardClick">
+
+        <ImageView
+            android:background="@mipmap/exchange_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:textSize="20dp"
+            android:text="交换名片"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/scanCode"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:onClick="scanClick">
+
+        <ImageView
+            android:background="@mipmap/scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:textSize="20dp"
+            android:text="扫 一 扫"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/home_bottom_nav"
@@ -50,5 +118,4 @@
         android:background="?android:attr/windowBackground"
         android:layout_gravity="bottom"
         app:menu="@menu/home_bottom_nav" />
-
 </LinearLayout>

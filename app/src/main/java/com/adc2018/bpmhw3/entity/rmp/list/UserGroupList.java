@@ -23,6 +23,10 @@ public class UserGroupList {
         return userGgroup == null || userGgroup.size() == 0;
     }
 
+    public UserGroup getFirstUserGroup() {
+        return userGgroup.get(0);
+    }
+
     @Override
     public String toString() {
         return "UserGroupList{" +

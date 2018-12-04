@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,21 +8,43 @@
     tools:context=".activity.GroupManageActivity">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
-            android:layout_weight="1"
-            android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:onClick="addGroupClick">
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+添加新的分组"
-            android:onClick="addGroupClick"
-            />
+            android:background="@mipmap/add"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="添加新的分组"
+            android:textSize="18dp"/>
     </LinearLayout>
-    <ExpandableListView
-        android:id="@+id/groupList"
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ExpandableListView>
+        android:layout_height="0dp"
+        android:layout_weight="10">
+        <ExpandableListView
+            android:id="@+id/groupList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ExpandableListView>
+    </LinearLayout>
+
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/home_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/windowBackground"
+        android:layout_gravity="bottom"
+        app:menu="@menu/home_bottom_nav" />
 
 </LinearLayout>

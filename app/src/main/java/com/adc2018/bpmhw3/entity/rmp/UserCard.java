@@ -1,10 +1,11 @@
 package com.adc2018.bpmhw3.entity.rmp;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class UserCard implements Serializable {
 
-    private static final String type = "UserCard";
+    private static final String type = "Usercard";
 
     private String id;
     private User user;
@@ -75,5 +76,18 @@ public class UserCard implements Serializable {
 
     public void setCreate_time(Long create_time) {
         this.create_time = create_time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserCard userCard = (UserCard) o;
+        return Objects.equals(id, userCard.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

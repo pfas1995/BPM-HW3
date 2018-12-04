@@ -4,9 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
@@ -34,14 +31,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.CardIdentifyActivity"></activity>
-        <activity android:name=".activity.RegisterActivity"></activity>
+        <activity android:name=".activity.CardIdentifyActivity" />
+        <activity android:name=".activity.RegisterActivity" />
         <activity
             android:name=".activity.HomeActivity"
-            android:label="@string/title_activity_home"></activity>
-        <activity android:name=".activity.AdjustActivity"></activity>
-        <activity android:name=".activity.DesignCardActivity"></activity>
-        <activity android:name=".activity.GroupManageActivity"></activity>
+            android:label="@string/title_activity_home" />
+        <activity android:name=".activity.AdjustActivity" />
+        <activity android:name=".activity.DesignCardActivity" />
+        <activity android:name=".activity.GroupManageActivity" />
+        <activity android:name=".activity.ShowQRCodeActivity" />
         <activity android:name=".activity.ExchangeCardActivity"></activity>
     </application>
 

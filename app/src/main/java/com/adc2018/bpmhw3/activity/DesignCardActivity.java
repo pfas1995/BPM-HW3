@@ -65,7 +65,7 @@ public class DesignCardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.progressbar_layout);
+        setContentView(R.layout.loading_layout);
         this.user = BPM3.user;
         Log.d(TAG, "onCreate: " + BPM3.user.toString());
         Call<UserCardList> call = api.getUserCardByUserId(BPM3.user.getId());
@@ -141,7 +141,7 @@ public class DesignCardActivity extends AppCompatActivity {
                         Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
                         userCard = null;
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "onResponse: ", e);
                     }
                 }
             }

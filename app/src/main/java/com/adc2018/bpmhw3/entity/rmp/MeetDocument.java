@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class MeetDocument implements Serializable {
 
-    private static final String type = "MeetDocument";
+    private static final String type = "Meetdocument";
 
     private String id;
     private Long meet_time;

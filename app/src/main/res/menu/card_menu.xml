@@ -6,6 +6,11 @@
         android:title="移动到其他分组"/>
 
     <item
+        android:id="@+id/share"
+        android:icon="@mipmap/ic_launcher"
+        android:title="分享"/>
+
+    <item
         android:id="@+id/remove"
         android:icon="@mipmap/ic_launcher"
         android:title="移除"/>

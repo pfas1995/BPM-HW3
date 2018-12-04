@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CardGroup implements Serializable {
 
-    private static final String type = "CardGroup";
+    private static final String type = "Cardgroup";
 
     private String id;
     private String group_name;

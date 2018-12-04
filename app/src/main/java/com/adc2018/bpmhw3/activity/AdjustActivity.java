@@ -49,7 +49,7 @@ public class AdjustActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.progressbar_layout);
+        setContentView(R.layout.loading_layout);
         init();
     }
 
@@ -78,7 +78,7 @@ public class AdjustActivity extends AppCompatActivity {
      *
      */
     private void init() {
-        Call<UserGroupList> call = api.getUserGroup(BPM3.user.getId());
+        Call<UserGroupList> call = api.getUserGroupByUserId(BPM3.user.getId());
         call.enqueue(new Callback<UserGroupList>() {
             @Override
             public void onResponse(Call<UserGroupList> call, Response<UserGroupList> response) {

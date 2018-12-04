@@ -1,11 +1,15 @@
 package com.adc2018.bpmhw3.activity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.InputType;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
@@ -36,6 +40,8 @@ public class GroupManageActivity extends AppCompatActivity {
 
     private static final String TAG = GroupManageActivity.class.getSimpleName();
 
+    BottomNavigationView bottomNavigationView;
+
     private QMUIDialog addGroupDialog;
     private QMUIDialog moveCardDialog;
     private ExpandableListView eView;
@@ -51,7 +57,7 @@ public class GroupManageActivity extends AppCompatActivity {
 
 
     private void init() {
-        Call<UserGroupList> call =  api.getUserGroup(BPM3.user.getId());
+        Call<UserGroupList> call =  api.getUserGroupByUserId(BPM3.user.getId());
         call.enqueue(new Callback<UserGroupList>() {
             @Override
             public void onResponse(Call<UserGroupList> call, Response<UserGroupList> response) {
@@ -88,6 +94,26 @@ public class GroupManageActivity extends AppCompatActivity {
                 userGroup);
         eView = findViewById(R.id.groupList);
         eView.setAdapter(adapter);
+        bottomNavigationView = findViewById(R.id.home_bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_dashboard);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        Intent intent = new Intent(GroupManageActivity.this, HomeActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        startActivity(intent);
+//                        finish();
+                        break;
+                    case R.id.navigation_dashboard:
+                        break;
+                    case R.id.navigation_notifications:
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     public ExpandableListView getExpandableListView() {
@@ -97,7 +123,7 @@ public class GroupManageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.progressbar_layout);
+        setContentView(R.layout.loading_layout);
         init();
     }
 
@@ -267,7 +293,7 @@ public class GroupManageActivity extends AppCompatActivity {
 
 
     public void checkGroupNameValid(final String name) {
-        Call<UserGroupList> call =  api.getUserGroup(BPM3.user.getId());
+        Call<UserGroupList> call =  api.getUserGroupByUserId(BPM3.user.getId());
         call.enqueue(new Callback<UserGroupList>() {
             @Override
             public void onResponse(Call<UserGroupList> call, Response<UserGroupList> response) {

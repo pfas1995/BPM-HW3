@@ -2,9 +2,11 @@ package com.adc2018.bpmhw3.network.api.rmp;
 
 import com.adc2018.bpmhw3.entity.rmp.Card;
 import com.adc2018.bpmhw3.entity.rmp.CardGroup;
+import com.adc2018.bpmhw3.entity.rmp.Friend;
 import com.adc2018.bpmhw3.entity.rmp.User;
 import com.adc2018.bpmhw3.entity.rmp.UserCard;
 import com.adc2018.bpmhw3.entity.rmp.UserGroup;
+import com.adc2018.bpmhw3.entity.rmp.list.FriendList;
 import com.adc2018.bpmhw3.entity.rmp.list.UserCardList;
 import com.adc2018.bpmhw3.entity.rmp.list.UserGroupList;
 import com.adc2018.bpmhw3.network.entity.UserList;
@@ -54,8 +56,17 @@ public interface BPMApi {
     Call<UserGroup> addUserGroup(@Body UserGroup userGroup);
 
     @GET("Usergroup")
-    Call<UserGroupList> getUserGroup(@Query("Usergroup.user.id") String id);
+    Call<UserGroupList> getUserGroupByUserId(@Query("Usergroup.user.id") String id);
 
     @PUT("Usergroup/{id}")
     Call<UserGroup> updateUserGroup(@Path("id") String id, @Body UserGroup userGroup);
+
+    @POST("Friend")
+    Call<Friend> addFriend(@Body Friend Friend);
+
+    @GET("Friend")
+    Call<FriendList> getFriendByUserId(@Query("Friend.user.id") String id);
+
+    @PUT("Friend/{id}")
+    Call<Friend> updateFriend(@Path("id") String id, @Body Friend friend);
 }

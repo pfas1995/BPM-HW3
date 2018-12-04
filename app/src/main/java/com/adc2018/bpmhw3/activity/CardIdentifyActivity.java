@@ -167,7 +167,7 @@ public class CardIdentifyActivity extends AppCompatActivity {
 
                         picture.setImageBitmap(bitmap);
 //                        callAliyunOCR(encodeImage(bitmap));
-                        setContentView(R.layout.progressbar_layout);
+                        setContentView(R.layout.loading_layout);
                         callXfyunOCR(encodeImage(bitmap));
                     }
                     catch (FileNotFoundException e) {

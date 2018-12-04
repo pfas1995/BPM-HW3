@@ -5,6 +5,9 @@ import android.graphics.Matrix;
 
 import com.adc2018.bpmhw3.entity.rmp.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BPM3 {
     public static Bitmap changeBitmapScale(Bitmap bitmap, int nwidth, int nheight) {
         int width = bitmap.getWidth();
@@ -19,4 +22,6 @@ public class BPM3 {
 
     //登录用户
     public static User user;
+
+    public static Map<String, Object> activity = new HashMap<>();
 }

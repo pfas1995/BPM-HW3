@@ -2,6 +2,7 @@ package com.adc2018.bpmhw3.entity.rmp;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class UserGroup implements Serializable {
 
@@ -44,6 +45,18 @@ public class UserGroup implements Serializable {
 
     public static String getType() {
         return type;
+    }
+
+
+    public CardGroup defaultGroup() {
+        if(group != null) {
+            for(CardGroup cardGroup: group) {
+                if(Objects.equals(cardGroup.getGroup_name(), user.getUser_name() + "默认分组")) {
+                    return  cardGroup;
+                }
+            }
+        }
+        return null;
     }
 
 
