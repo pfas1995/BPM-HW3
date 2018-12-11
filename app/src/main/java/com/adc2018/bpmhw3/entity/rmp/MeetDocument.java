@@ -1,5 +1,7 @@
 package com.adc2018.bpmhw3.entity.rmp;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class MeetDocument implements Serializable {
@@ -8,10 +10,23 @@ public class MeetDocument implements Serializable {
 
     private String id;
     private Long meet_time;
+
+    @SerializedName("meet_longitude")
     private Double meet_longitide;
     private Double meet_latitude;
     private String description;
 
+
+    public static MeetDocument Factory(Long meet_time, Double meet_longitide, Double meet_latitude,
+                                       String description) {
+        MeetDocument meetDocument = new MeetDocument();
+        meetDocument.meet_time = meet_time;
+        meetDocument.meet_longitide = meet_longitide;
+        meetDocument.meet_latitude = meet_latitude;
+        meetDocument.description = description;
+        return meetDocument;
+
+    }
     public String getId() {
         return id;
     }

@@ -11,6 +11,8 @@ import android.widget.Spinner;
 import com.adc2018.bpmhw3.R;
 import com.adc2018.bpmhw3.entity.rmp.Card;
 import com.adc2018.bpmhw3.entity.rmp.CardGroup;
+import com.adc2018.bpmhw3.entity.rmp.Group;
+import com.adc2018.bpmhw3.entity.rmp.Meet;
 import com.adc2018.bpmhw3.entity.rmp.UserGroup;
 import com.adc2018.bpmhw3.entity.rmp.list.UserGroupList;
 import com.adc2018.bpmhw3.network.RetrofitTool;
@@ -19,15 +21,20 @@ import com.adc2018.bpmhw3.network.api.rmp.RmpUtil;
 import com.adc2018.bpmhw3.utils.BPM3;
 
 import java.io.IOException;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+
+/**
+ * 识别结果调整
+ * */
 public class AdjustActivity extends AppCompatActivity {
 
     private static final String TAG = AdjustActivity.class.getSimpleName();
+
+    private static final int ADD_MEET = 0;
 
     private EditText editName;
     private EditText editCompany;
@@ -41,8 +48,8 @@ public class AdjustActivity extends AppCompatActivity {
 
     private Card card;
     private UserGroup userGroup;
-    private CardGroup defaultCardGroup;
-    private List<CardGroup> cardGroups;
+    private Group defaultGroup;
+    private CardGroup cardGroup;
 
 
 
@@ -70,6 +77,8 @@ public class AdjustActivity extends AppCompatActivity {
         editAddress.setText(card.getAddress());
         editEmail.setText(card.getEmail());
     }
+
+
     public void initSpinner() {
 
     }
@@ -78,15 +87,15 @@ public class AdjustActivity extends AppCompatActivity {
      *
      */
     private void init() {
-        Call<UserGroupList> call = api.getUserGroupByUserId(BPM3.user.getId());
+        Call<UserGroupList> call = api.getUserGroupByUserIdAndGroupName(BPM3.user.getId(),
+                BPM3.user.getUser_name() + "默认分组");
         call.enqueue(new Callback<UserGroupList>() {
             @Override
             public void onResponse(Call<UserGroupList> call, Response<UserGroupList> response) {
                 if(response.isSuccessful()) {
                     UserGroupList userGroupList = response.body();
                     userGroup = userGroupList.getUserGgroup().get(0);
-                    cardGroups = userGroup.getGroup();
-                    defaultCardGroup = findDefaultGroup(cardGroups);
+                    defaultGroup = userGroup.getGroup();
                     initWidegt();
                 }
                 else {
@@ -106,16 +115,6 @@ public class AdjustActivity extends AppCompatActivity {
             }
         });
     }
-
-    public CardGroup findDefaultGroup(List<CardGroup> cardGroups) {
-        for(CardGroup cardGroup : cardGroups) {
-            if(cardGroup.getGroup_name().contains("默认分组")) {
-                return cardGroup;
-            }
-        }
-        return null;
-    }
-
 
     /**
      * 取消按钮响应
@@ -156,19 +155,15 @@ public class AdjustActivity extends AppCompatActivity {
     }
 
     public void addCardToDefaultGroup() {
-        defaultCardGroup.addCard(card);
-        Call<CardGroup> call = api.updateCardGroup(defaultCardGroup.getId(), defaultCardGroup);
+        CardGroup cardGroup = CardGroup.Factory(defaultGroup, card);
+        Call<CardGroup> call = api.addCardGroup(cardGroup);
         call.enqueue(new Callback<CardGroup>() {
             @Override
             public void onResponse(Call<CardGroup> call, Response<CardGroup> response) {
                 if(response.isSuccessful()) {
-                    defaultCardGroup = response.body();
-                    Intent intent = new Intent();
-                    AdjustActivity.this.setResult(RESULT_OK, intent);
-                    finish();
+                    addMeet();
                 }
                 else {
-                    defaultCardGroup.removeCard(card);
                     try {
                         Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
                     } catch (IOException e) {
@@ -179,7 +174,6 @@ public class AdjustActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<CardGroup> call, Throwable t) {
-                defaultCardGroup.removeCard(card);
                 Log.e(TAG, "onFailure: ", t);
             }
         });
@@ -193,5 +187,23 @@ public class AdjustActivity extends AppCompatActivity {
      */
     public void confirmClick(View view) {
         addCard();
+    }
+
+
+    public void addMeet() {
+        Intent intent = new Intent(AdjustActivity.this, MeetActivity.class);
+        intent.putExtra("card", card);
+        startActivityForResult(intent, ADD_MEET);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        switch (requestCode) {
+            case ADD_MEET:
+                Intent intent1 = new Intent();
+                AdjustActivity.this.setResult(RESULT_OK, intent1);
+                finish();
+        }
     }
 }

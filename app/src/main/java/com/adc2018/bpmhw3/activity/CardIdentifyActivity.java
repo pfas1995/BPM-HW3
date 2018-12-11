@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -30,6 +31,12 @@ import com.adc2018.bpmhw3.entity.rmp.Card;
 import com.adc2018.bpmhw3.network.RetrofitTool;
 import com.adc2018.bpmhw3.network.api.ocr.OCRApi;
 import com.adc2018.bpmhw3.network.api.ocr.OCRUtil;
+import com.yanzhenjie.permission.Action;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Permission;
+import com.yzq.zxinglibrary.android.CaptureActivity;
+import com.yzq.zxinglibrary.bean.ZxingConfig;
+import com.yzq.zxinglibrary.common.Constant;
 
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
@@ -42,6 +49,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Objects;
 
 import okhttp3.ResponseBody;
@@ -92,10 +100,29 @@ public class CardIdentifyActivity extends AppCompatActivity {
                     "com.adc2018.bpmhw3.fileprovider", outputImage);
         }
 
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 1024*4);
-        startActivityForResult(intent, TAKE_PHOTO);
+        AndPermission.with(this)
+                .permission(Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE)
+                .onGranted(new Action() {
+                    @Override
+                    public void onAction(List<String> permissions) {
+                        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                        intent.putExtra(MediaStore.EXTRA_SIZE_LIMIT, 1024*4);
+                        startActivityForResult(intent, TAKE_PHOTO);
+                    }
+                })
+                .onDenied(new Action() {
+                    @Override
+                    public void onAction(List<String> permissions) {
+                        Uri packageURI = Uri.parse("package:" + getPackageName());
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        Toast.makeText(CardIdentifyActivity.this, "没有权限识别", Toast.LENGTH_LONG).show();
+                        CardIdentifyActivity.this.setResult(RESULT_CANCELED);
+                        finish();
+                    }
+                }).start();
     }
 
     /**
@@ -308,7 +335,9 @@ public class CardIdentifyActivity extends AppCompatActivity {
     private void callXfyunOCR(String imageEncode) {
         final Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
         final OCRApi api = retrofit.create(OCRApi.class);
-        Call<ResponseBody> call = api.xfyunCard(imageEncode);
+        CardImage image = new CardImage();
+        image.setImage(imageEncode);
+        Call<ResponseBody> call = api.xfyunCard(image);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

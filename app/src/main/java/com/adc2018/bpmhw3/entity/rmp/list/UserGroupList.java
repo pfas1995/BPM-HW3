@@ -3,6 +3,7 @@ package com.adc2018.bpmhw3.entity.rmp.list;
 import com.adc2018.bpmhw3.entity.rmp.UserGroup;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserGroupList {
@@ -12,6 +13,7 @@ public class UserGroupList {
 
 
     public List<UserGroup> getUserGgroup() {
+        if(userGgroup == null) userGgroup = new ArrayList<>();
         return userGgroup;
     }
 

@@ -1,5 +1,7 @@
 package com.adc2018.bpmhw3.entity.rmp;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class Meet implements Serializable {
@@ -9,8 +11,17 @@ public class Meet implements Serializable {
     private String id;
     private User persona;
     private Card personb;
+
+    @SerializedName("meetdocument")
     private MeetDocument meetDocument;
 
+    public static Meet Factory(User persona, Card card, MeetDocument meetDocument) {
+        Meet meet = new Meet();
+        meet.setPersona(persona);
+        meet.setPersonb(card);
+        meet.setMeetDocument(meetDocument);
+        return meet;
+    }
     public String getId() {
         return id;
     }

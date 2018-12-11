@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class UserCard implements Serializable {
 
-    private static final String type = "Usercard";
+    private static final String type = "usercard";
 
     private String id;
     private User user;

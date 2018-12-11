@@ -12,6 +12,7 @@ import com.adc2018.bpmhw3.R;
 import com.adc2018.bpmhw3.entity.rmp.CardGroup;
 import com.adc2018.bpmhw3.entity.rmp.Friend;
 import com.adc2018.bpmhw3.entity.rmp.UserCard;
+import com.adc2018.bpmhw3.entity.rmp.UserGroup;
 import com.adc2018.bpmhw3.entity.rmp.list.FriendList;
 import com.adc2018.bpmhw3.entity.rmp.list.UserCardList;
 import com.adc2018.bpmhw3.entity.rmp.list.UserGroupList;
@@ -39,6 +40,7 @@ public class ExchangeCardActivity extends AppCompatActivity {
     private static final String TAG = ExchangeCardActivity.class.getSimpleName();
 
     private static final int SCAN_QRCODE = 0;
+    private static final int ADD_MEET = 1;
 
 
     private String uid;
@@ -51,8 +53,8 @@ public class ExchangeCardActivity extends AppCompatActivity {
 
     private Friend friendA;
     private Friend friendB;
-    private CardGroup groupA;
-    private CardGroup groupB;
+    private UserGroup groupA;
+    private UserGroup groupB;
 //    private int rollBack = 0;
 
     private static final BPMApi api = RetrofitTool.getRetrofit(RmpUtil.getBaseUrl()).create(BPMApi.class);
@@ -126,6 +128,10 @@ public class ExchangeCardActivity extends AppCompatActivity {
                     finish();
                 }
                 break;
+            case ADD_MEET:
+                finish();
+                break;
+                default:
         }
     }
 
@@ -162,8 +168,7 @@ public class ExchangeCardActivity extends AppCompatActivity {
             public void onResponse(Call<UserCardList> call, Response<UserCardList> response) {
                 if(response.isSuccessful()) {
                     userCardB = response.body().getUsercard().get(0);
-                    getFriendA();
-
+                    getUserGroupA();
                 }
                 else {
                     Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
@@ -180,63 +185,15 @@ public class ExchangeCardActivity extends AppCompatActivity {
         });
     }
 
-    public void getFriendA() {
-        Call<FriendList> call = api.getFriendByUserId(userCardA.getUser().getId());
-        call.enqueue(new Callback<FriendList>() {
-            @Override
-            public void onResponse(Call<FriendList> call, Response<FriendList> response) {
-                if(response.isSuccessful()) {
-                    friendA = response.body().getFirstFriend();
-                    getFriendB();
-                }
-                else {
-                    Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<FriendList> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t);
-                Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-    }
-
-
-    public void getFriendB() {
-        Call<FriendList> call = api.getFriendByUserId(userCardA.getUser().getId());
-        call.enqueue(new Callback<FriendList>() {
-            @Override
-            public void onResponse(Call<FriendList> call, Response<FriendList> response) {
-                if(response.isSuccessful()) {
-                    friendB = response.body().getFirstFriend();
-                    getUserGroupA();
-                }
-                else {
-                    Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
-                    finish();
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<FriendList> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t);
-                Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-    }
 
     public void getUserGroupA() {
-        Call<UserGroupList> call = api.getUserGroupByUserId(userCardA.getUser().getId());
+        Call<UserGroupList> call = api.getUserGroupByUserIdAndGroupName(userCardA.getUser().getId(),
+                userCardA.getUser().getUser_name() + "默认分组");
         call.enqueue(new Callback<UserGroupList>() {
             @Override
             public void onResponse(Call<UserGroupList> call, Response<UserGroupList> response) {
                 if(response.isSuccessful()) {
-                    groupA = response.body().getFirstUserGroup().defaultGroup();
+                    groupA = response.body().getFirstUserGroup();
                     getUserGroupB();
                 }
                 else {
@@ -255,13 +212,14 @@ public class ExchangeCardActivity extends AppCompatActivity {
     }
 
     public void getUserGroupB() {
-        Call<UserGroupList> call = api.getUserGroupByUserId(userCardB.getUser().getId());
+        Call<UserGroupList> call = api.getUserGroupByUserIdAndGroupName(userCardB.getUser().getId(),
+                userCardB.getUser().getUser_name() + "默认分组");
         call.enqueue(new Callback<UserGroupList>() {
             @Override
             public void onResponse(Call<UserGroupList> call, Response<UserGroupList> response) {
                 if(response.isSuccessful()) {
-                    groupB = response.body().getFirstUserGroup().defaultGroup();
-                    exchangeCard();
+                    groupB = response.body().getFirstUserGroup();
+                    checkExchangeCard();
                 }
                 else {
                     Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
@@ -278,27 +236,56 @@ public class ExchangeCardActivity extends AppCompatActivity {
     }
 
 
+    public void checkExchangeCard() {
+        friendA = Friend.Factory(userCardA.getUser(), userCardB);
+        friendB = Friend.Factory(userCardB.getUser(), userCardA);
+        Call<FriendList> call = api.getUserABRelation(friendA.getUser().getId(), friendB.getUser().getId());
+        call.enqueue(new Callback<FriendList>() {
+            @Override
+            public void onResponse(Call<FriendList> call, Response<FriendList> response) {
+                if(response.isSuccessful()) {
+                    FriendList friendList = response.body();
+                    if(friendList.empty()) {
+                        exchangeCard();
+                    }
+                    else {
+                        Toast.makeText(ExchangeCardActivity.this, "已交换过", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                }
+                else {
+                    try{
+                        Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, "onResponse: ", e);
+                    }
+                    finally {
+                        Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FriendList> call, Throwable t) {
+
+            }
+        });
+    }
+
     public void exchangeCard() {
-        if(!friendA.containsFriend(userCardB)) {
-            friendA.addFriend(userCardB);
-            friendB.addFriend(userCardA);
-            groupA.addCard(userCardB.getCard());
-            groupB.addCard(userCardA.getCard());
-            putFriendA();
-        }
-        else {
-            Toast.makeText(ExchangeCardActivity.this, "已交换过", Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        addFriendA();
     }
 
-    public void putFriendA() {
-        Call<Friend> call = api.updateFriend(friendA.getId(), friendA);
+    public void addFriendA() {
+        Call<Friend> call = api.addFriend(friendA);
         call.enqueue(new Callback<Friend>() {
             @Override
             public void onResponse(Call<Friend> call, Response<Friend> response) {
                 if(response.isSuccessful()) {
-                    putFirendB();
+                    addFirendB();
                 }
                 else {
                     try {
@@ -321,13 +308,13 @@ public class ExchangeCardActivity extends AppCompatActivity {
         });
     }
 
-    public void putFirendB() {
-        Call<Friend> call = api.updateFriend(friendB.getId(), friendB);
+    public void addFirendB() {
+        Call<Friend> call = api.addFriend(friendB);
         call.enqueue(new Callback<Friend>() {
             @Override
             public void onResponse(Call<Friend> call, Response<Friend> response) {
                 if(response.isSuccessful()) {
-                    putGroupA();
+                    addCardGroupA();
                 }
                 else {
                     try {
@@ -345,18 +332,20 @@ public class ExchangeCardActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Friend> call, Throwable t) {
                 Toast.makeText(ExchangeCardActivity.this, "交换失败", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "onFailure: ", t);
                 finish();
             }
         });
     }
 
-    public void putGroupA() {
-        Call<CardGroup> call = api.updateCardGroup(groupA.getId(), groupA);
+    public void addCardGroupA() {
+        CardGroup cardGroup = CardGroup.Factory(groupA.getGroup(), userCardB.getCard());
+        Call<CardGroup> call = api.addCardGroup(cardGroup);
         call.enqueue(new Callback<CardGroup>() {
             @Override
             public void onResponse(Call<CardGroup> call, Response<CardGroup> response) {
                 if(response.isSuccessful()) {
-                    putGroupB();
+                    addCardGroupB();
                 }
                 else {
 
@@ -380,15 +369,17 @@ public class ExchangeCardActivity extends AppCompatActivity {
         });
     }
 
-    public void putGroupB() {
-        Call<CardGroup> call = api.updateCardGroup(groupB.getId(), groupB);
+    public void addCardGroupB() {
+        CardGroup cardGroup = CardGroup.Factory(groupB.getGroup(), userCardA.getCard());
+        Call<CardGroup> call = api.addCardGroup(cardGroup);
         call.enqueue(new Callback<CardGroup>() {
             @Override
             public void onResponse(Call<CardGroup> call, Response<CardGroup> response) {
                 if(response.isSuccessful()) {
                     Toast.makeText(ExchangeCardActivity.this, "交换成功", Toast.LENGTH_SHORT).show();
-                    ExchangeCardActivity.this.setResult(RESULT_OK);
-                    finish();
+                    Intent intent = new Intent(ExchangeCardActivity.this, MeetActivity.class);
+                    intent.putExtra("card", userCardB.getCard());
+                    startActivityForResult(intent, ADD_MEET);
                 }
                 else {
                     try {
@@ -410,6 +401,8 @@ public class ExchangeCardActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 //    public void rollBack() {
 //

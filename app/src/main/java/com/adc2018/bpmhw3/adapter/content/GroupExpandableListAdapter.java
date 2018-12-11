@@ -17,6 +17,7 @@ import com.adc2018.bpmhw3.entity.rmp.Card;
 import com.adc2018.bpmhw3.entity.rmp.CardGroup;
 import com.adc2018.bpmhw3.entity.rmp.UserGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,45 +25,59 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context ctx;
     private GroupManageActivity activity;
-    private UserGroup userGroup;
+    private List<UserGroup> groups;
+    private List<List<CardGroup>> childs;
     private PopupMenu cardPopupMenu;
     private PopupMenu groupPopupMenu;
-    private int cgroupPosition;
-    private int cchildPosition;
 
-    public static GroupExpandableListAdapter Factory(Context ctx, UserGroup userGroup) {
+    public static GroupExpandableListAdapter Factory(Context ctx, List<UserGroup> groups, List<List<CardGroup>> childs) {
         GroupExpandableListAdapter adapter = new GroupExpandableListAdapter();
         adapter.ctx = ctx;
-        adapter.userGroup = userGroup;
+        adapter.groups = groups;
+        adapter.childs = childs;
         adapter.activity = (GroupManageActivity) ctx;
         return adapter;
     }
 
-    public void setGroups(UserGroup userGroup) {
-        this.userGroup = userGroup;
+    public void setGroups(List<UserGroup> groups) {
+        this.groups = groups;
+    }
+
+    public void setChilds(List<List<CardGroup>> childs) {
+        this.childs = childs;
+    }
+
+    public CardGroup removeChild(int groupPosition, int childPosition) {
+        return childs.get(groupPosition).remove(childPosition);
+    }
+
+    public void addGroup(UserGroup userGroup) {
+        groups.add(userGroup);
+        childs.add(new ArrayList<CardGroup>());
+    }
+
+    public void addChild(int groupPosition, CardGroup cardGroup) {
+       childs.get(groupPosition).add(cardGroup);
     }
 
     @Override
     public int getGroupCount() {
-        return userGroup.getGroup().size();
+        return groups.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        List<CardGroup> groups = userGroup.getGroup();
-        return groups.get(groupPosition).getCards().size();
+        return childs.get(groupPosition).size();
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        List<CardGroup> groups = userGroup.getGroup();
         return groups.get(groupPosition);
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        List<CardGroup> groups = userGroup.getGroup();
-        return groups.get(groupPosition).getCards().get(childPosition);
+        return childs.get(groupPosition).get(childPosition);
     }
 
     @Override
@@ -80,19 +95,27 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
+
+    /**
+     * 获取 GroupView
+     * @param groupPosition
+     * @param isExpanded
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @Override
     public View getGroupView(final int groupPosition, final boolean isExpanded, View convertView, ViewGroup parent) {
         View view;
-        List<CardGroup> groups = userGroup.getGroup();
         if(convertView == null) {
             view = LayoutInflater.from(ctx).inflate(R.layout.group_layout, parent, false);
         }
         else {
             view = convertView;
         }
-        CardGroup cardGroup = groups.get(groupPosition);
+        UserGroup userGroup = groups.get(groupPosition);
         GroupViewHolder viewHolder = GroupViewHolder.Factory(view);
-        viewHolder.setContent(cardGroup);
+        viewHolder.setContent(userGroup);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,26 +139,34 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
         return view;
     }
 
+
+    /**
+     * 获取某个 GroupView 的 childView 并设置长按监听
+     * @param groupPosition
+     * @param childPosition
+     * @param isLastChild
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @Override
-    public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         View view;
-        List<CardGroup> groups = userGroup.getGroup();
+
         if(convertView == null) {
             view = LayoutInflater.from(ctx).inflate(R.layout.group_member_layout, parent, false);
         }
         else {
             view = convertView;
         }
-        Card card = groups.get(groupPosition).getCards().get(childPosition);
+        CardGroup cardGroup = childs.get(groupPosition).get(childPosition);
         GroupMemberViewHolder viewHolder = GroupMemberViewHolder.Factory(view);
-        viewHolder.setContent(card);
+        viewHolder.setContent(cardGroup);
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                GroupExpandableListAdapter.this.cgroupPosition = groupPosition;
-                GroupExpandableListAdapter.this.cchildPosition = cchildPosition;
-                showCardPopupMenu(v);
-                return false;
+                showCardPopupMenu(v, groupPosition, childPosition);
+                return true;
             }
         });
         return view;
@@ -167,8 +198,8 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             viewHolder.textView = view.findViewById(R.id.groupName);
             return viewHolder;
         }
-        public void setContent(CardGroup cardGroup) {
-            textView.setText(cardGroup.getGroup_name());
+        public void setContent(UserGroup userGroup) {
+            textView.setText(userGroup.getGroup().getName());
         }
 
     }
@@ -192,7 +223,8 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
             return viewHolder;
         }
 
-        public void setContent(Card card) {
+        public void setContent(CardGroup cardGroup) {
+            Card card = cardGroup.getCard();
             cardName.setText(card.getName());
             cardCompany.setText(card.getCompany());
             cardPosition.setText(card.getPosition());
@@ -202,21 +234,38 @@ public class GroupExpandableListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    private void showCardPopupMenu(View view) {
+
+    /**
+     * 某个名片长按弹出选项
+     * @param view
+     */
+    private void showCardPopupMenu(View view, final int cgroupPosition, final int cchildPosition) {
         cardPopupMenu = new PopupMenu(activity, view);
         cardPopupMenu.getMenuInflater().inflate(R.menu.card_menu, cardPopupMenu.getMenu());
         cardPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 // 控件每一个item的点击事件
+                CardGroup cardGroup = (CardGroup) GroupExpandableListAdapter.this.getChild(cgroupPosition, cchildPosition);
+                Card card = cardGroup.getCard();
                 switch (item.getItemId()) {
                     case R.id.move:
                         activity.moveCardDialog(cgroupPosition, cchildPosition);
-//                        Toast.makeText(activity, "move：" + String.valueOf(cgroupPosition), Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.remove:
+                    case R.id.share:
+                        activity.shareCard(card);
+                        break;
+                    case R.id.meet:
+                        activity.showMeet(card);
                         break;
                     case R.id.call:
+                        activity.callCard(card);
+                        break;
+                    case R.id.message:
+                        activity.messageCard(card);
+                        break;
+                    case R.id.remove:
+                        activity.removeCardPre(cgroupPosition, cchildPosition);
                         break;
                 }
                 return true;

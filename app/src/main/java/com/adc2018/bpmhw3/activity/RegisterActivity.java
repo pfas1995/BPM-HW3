@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.adc2018.bpmhw3.R;
 import com.adc2018.bpmhw3.entity.rmp.CardGroup;
+import com.adc2018.bpmhw3.entity.rmp.Group;
 import com.adc2018.bpmhw3.entity.rmp.User;
 import com.adc2018.bpmhw3.entity.rmp.UserGroup;
 import com.adc2018.bpmhw3.network.RetrofitTool;
@@ -19,8 +20,6 @@ import com.adc2018.bpmhw3.network.api.rmp.RmpUtil;
 import com.adc2018.bpmhw3.network.entity.UserList;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import retrofit2.Call;
@@ -39,6 +38,7 @@ public class RegisterActivity extends AppCompatActivity {
     private User user;
 
     private UserGroup userGroup;
+    private Group defaultGroup;
     private CardGroup defaultCardGroup;
 
 
@@ -51,8 +51,6 @@ public class RegisterActivity extends AppCompatActivity {
         passwdEdit = findViewById(R.id.registerPasswd);
         passwdconfirmEdit = findViewById(R.id.registerPasswdConfirm);
     }
-
-
 
     /**
      * 注册按钮监听事件
@@ -156,16 +154,14 @@ public class RegisterActivity extends AppCompatActivity {
      * 创建用户默认分组
      */
     public void addDefaultCardGroup() {
-        defaultCardGroup = CardGroup.Factory(user.getUser_name() + "默认分组");
-        Call<CardGroup> call = bpmApi.addCardGroup(defaultCardGroup);
-        call.enqueue(new Callback<CardGroup>() {
+        defaultGroup = Group.Factory(user.getUser_name() + "默认分组");
+        Call<Group> call = bpmApi.addGroup(defaultGroup);
+        call.enqueue(new Callback<Group>() {
             @Override
-            public void onResponse(Call<CardGroup> call, Response<CardGroup> response) {
+            public void onResponse(Call<Group> call, Response<Group> response) {
                 if(response.isSuccessful()) {
-                    defaultCardGroup = response.body();
-                    List<CardGroup> cardGroups = new ArrayList<>();
-                    cardGroups.add(defaultCardGroup);
-                    addUserGroup(cardGroups);
+                    defaultGroup = response.body();
+                    addUserGroup(defaultGroup);
                 }
                 else {
                     try {
@@ -177,7 +173,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<CardGroup> call, Throwable t) {
+            public void onFailure(Call<Group> call, Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
@@ -185,10 +181,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     /**
      * 创建用户分组
-     * @param cardGroups
+     * @param group 新增分组
      */
-    public void addUserGroup(final List<CardGroup> cardGroups) {
-        userGroup = UserGroup.Factory(user, cardGroups);
+    public void addUserGroup(final Group group) {
+        userGroup = UserGroup.Factory(user, group);
         Call<UserGroup> call = bpmApi.addUserGroup(userGroup);
         call.enqueue(new Callback<UserGroup>() {
             @Override
@@ -204,6 +200,9 @@ public class RegisterActivity extends AppCompatActivity {
                         Log.d(TAG, "onResponse: " + new String(response.errorBody().bytes()));
                     } catch (IOException e) {
                         Log.e(TAG, "onResponse: ", e);
+                    }
+                    finally {
+                        Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
                     }
                 }
             }

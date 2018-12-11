@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BPMHW3</string>
+    <string name="app_name">互联网名片管理系统</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
@@ -27,4 +27,5 @@
     <string name="title_home">主页</string>
     <string name="title_dashboard">分组管理</string>
     <string name="title_notifications">通知</string>
+    <string name="title_activity_meet">MeetActivity</string>
 </resources>

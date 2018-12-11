@@ -31,15 +31,7 @@
             android:text="拍照"
             android:background="@drawable/qmui_dialog_action_button_bg_pressed"/>
 
-        <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
-            android:id="@+id/button"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="10dp"
-            android:onClick="choosePhoto"
-            android:text="选择照片"
-            android:background="@drawable/qmui_dialog_action_button_bg_pressed"/>
+
     </LinearLayout>
 
 </LinearLayout>

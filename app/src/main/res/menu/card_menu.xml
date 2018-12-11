@@ -11,9 +11,9 @@
         android:title="分享"/>
 
     <item
-        android:id="@+id/remove"
+        android:id="@+id/meet"
         android:icon="@mipmap/ic_launcher"
-        android:title="移除"/>
+        android:title="查看添加记录"/>
 
     <item
         android:id="@+id/call"
@@ -24,6 +24,11 @@
         android:id="@+id/message"
         android:icon="@mipmap/ic_launcher"
         android:title="发消息"/>
+
+    <item
+        android:id="@+id/remove"
+        android:icon="@mipmap/ic_launcher"
+        android:title="移除"/>
 </menu>
 
 

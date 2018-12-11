@@ -108,7 +108,9 @@ public class HttpRequest {
     public void xfyunCardOCR(String imageEncode) {
         Retrofit retrofit = RetrofitTool.getRetrofit(OCRUtil.getXfyunOCRBaseUrl());
         final OCRApi api = retrofit.create(OCRApi.class);
-        Call<ResponseBody> call = api.xfyunCard(imageEncode);
+        CardImage image = new CardImage();
+        image.setImage(imageEncode);
+        Call<ResponseBody> call = api.xfyunCard(image);
         callEnqueue(call);
      }
 

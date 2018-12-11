@@ -1,30 +1,25 @@
 package com.adc2018.bpmhw3.entity.rmp;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CardGroup implements Serializable {
 
     private static final String type = "Cardgroup";
 
     private String id;
-    private String group_name;
-    private List<Card> cards;
+    private Group group;
+    private Card card;
 
-    public static CardGroup Factory(String group_name) {
+    public static CardGroup Factory(Group group, Card card) {
         CardGroup cardGroup = new CardGroup();
-        cardGroup.setGroup_name(group_name);
-        cardGroup.setCards(new ArrayList<Card>());
+        cardGroup.group = group;
+        cardGroup.card = card;
         return cardGroup;
     }
 
-    public static CardGroup Factory(String id, String group_name, List<Card> cards) {
-        CardGroup cardGroup = new CardGroup();
-        cardGroup.setId(id);
-        cardGroup.setGroup_name(group_name);
-        cardGroup.setCards(cards);
-        return cardGroup;
+
+    public static String getType() {
+        return type;
     }
 
     public String getId() {
@@ -35,45 +30,28 @@ public class CardGroup implements Serializable {
         this.id = id;
     }
 
-    public String getGroup_name() {
-        return group_name;
+    public Group getGroup() {
+        return group;
     }
 
-    public void setGroup_name(String group_name) {
-        this.group_name = group_name;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
-    public List<Card> getCards() {
-        return cards;
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
     }
 
     @Override
     public String toString() {
         return "CardGroup{" +
                 "id='" + id + '\'' +
-                ", group_name='" + group_name + '\'' +
-                ", cards=" + cards +
+                ", group=" + group +
+                ", card=" + card +
                 '}';
-    }
-
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
-    }
-
-    public static String getType() {
-        return type;
-    }
-
-    public void addCard(Card card) {
-        if(cards == null) {
-            cards = new ArrayList<>();
-        }
-        cards.add(card);
-    }
-
-    public void removeCard(Card card) {
-        if(cards != null) {
-            cards.remove(card);
-        }
     }
 }

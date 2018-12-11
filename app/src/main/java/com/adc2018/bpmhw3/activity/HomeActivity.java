@@ -43,8 +43,8 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.activity_home);
         userName = findViewById(R.id.userName);
         userName.setText(BPM3.user.getUser_name());
-        bottomNavigationView = findViewById(R.id.home_bottom_nav);
-        bottomNavigationView.setSelectedItemId(R.id.home_bottom_nav);
+        bottomNavigationView = findViewById(R.id.bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -54,16 +54,27 @@ public class HomeActivity extends Activity {
                     case R.id.navigation_dashboard:
 
                         Intent intent = new Intent(HomeActivity.this, GroupManageActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                         startActivity(intent);
-//                        finish();
+                        finish();
                         break;
                     case R.id.navigation_notifications:
+                        intent = new Intent(HomeActivity.this, ShareManageActivity.class);
+                        startActivity(intent);
+                        finish();
                         break;
                 }
                 return true;
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+        }
     }
 
     /**

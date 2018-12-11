@@ -3,8 +3,7 @@ package com.adc2018.bpmhw3.entity.rmp;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class Friend implements Serializable {
 
@@ -12,15 +11,15 @@ public class Friend implements Serializable {
 
     private String id;
     private User user;
-    @SerializedName("user_friends")
-    private List<UserCard> friends;
+    @SerializedName("usercard")
+    private UserCard userCard;
     private Long create_time;
 
 
-    public static Friend Factory(User user) {
+    public static Friend Factory(User user, UserCard userCard) {
         Friend friend = new Friend();
         friend.user = user;
-        friend.friends = new ArrayList<>();
+        friend.userCard = userCard;
         friend.create_time = System.currentTimeMillis();
         return friend;
     }
@@ -46,36 +45,44 @@ public class Friend implements Serializable {
         this.user = user;
     }
 
-    public List<UserCard> getFriends() {
-        return friends;
+    public UserCard getUserCard() {
+        return userCard;
     }
 
-    public void setFriends(List<UserCard> friends) {
-        this.friends = friends;
+    public void setUserCard(UserCard userCard) {
+        this.userCard = userCard;
     }
 
     public Long getCreate_time() {
         return create_time;
     }
 
-    public void addFriend(UserCard userCard) {
-        friends.add(userCard);
+    public void setCreate_time(Long create_time) {
+        this.create_time = create_time;
     }
 
-    public Boolean containsFriend(UserCard userCard) {
-        return friends.contains(userCard);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Friend friend = (Friend) o;
+        return Objects.equals(id, friend.id);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return "Friend{" +
-                "user=" + user +
-                ", friends=" + friends +
+                "id='" + id + '\'' +
+                ", user=" + user +
+                ", userCard=" + userCard +
                 ", create_time=" + create_time +
                 '}';
-    }
-
-    public void setCreate_time(Long create_time) {
-        this.create_time = create_time;
     }
 }

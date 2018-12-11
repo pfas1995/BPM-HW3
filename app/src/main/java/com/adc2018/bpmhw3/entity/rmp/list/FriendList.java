@@ -3,6 +3,7 @@ package com.adc2018.bpmhw3.entity.rmp.list;
 import com.adc2018.bpmhw3.entity.rmp.Friend;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FriendList {
@@ -11,6 +12,7 @@ public class FriendList {
     private List<Friend> friends;
 
     public List<Friend> getFriends() {
+        if(friends == null) friends =  new ArrayList<>();
         return friends;
     }
 
